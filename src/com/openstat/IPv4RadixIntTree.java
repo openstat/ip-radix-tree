@@ -13,7 +13,7 @@ public class IPv4RadixIntTree {
     private static final long MAX_IPV4_BIT = 0x80000000L;
 
     public static class Node {
-        private Node right, left, parent;
+        private Node right, left;
         private int value;
     }
 
@@ -50,7 +50,6 @@ public class IPv4RadixIntTree {
 
         while ((bit & mask) != 0) {
             next = new Node();
-            next.parent = node;
             next.value = NO_VALUE;
 
             if ((key & bit) != 0) {
