@@ -46,7 +46,7 @@ public class BenchmarkTests {
         gc();
         long m1 = Runtime.getRuntime().freeMemory();
 
-        IPv4RadixIntTree tr = new IPv4RadixIntTree();
+        IPv4RadixIntTree tr = new IPv4RadixIntTree(500000);
 
         for (int i = 0; i < N; i++) {
             int cidr = rnd.nextInt(33);

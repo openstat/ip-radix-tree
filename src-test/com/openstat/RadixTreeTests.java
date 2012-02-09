@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public class RadixTreeTests {
     @Test
     public void testCidrInclusion() {
-        IPv4RadixIntTree tr = new IPv4RadixIntTree();
+        IPv4RadixIntTree tr = new IPv4RadixIntTree(100);
         tr.put(0x0a000000, 0xffffff00, 42);
         tr.put(0x0a000000, 0xff000000, 69);
 
