@@ -60,10 +60,10 @@ public class IPv4RadixIntTree {
 
             bit >>= 1;
             node = next;
+            size++;
         }
 
         node.value = value;
-        size++;
     }
 
     public int selectValue(long key) {
