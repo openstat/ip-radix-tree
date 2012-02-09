@@ -1,11 +1,17 @@
 package com.openstat;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+
 public class IPv4RadixIntTree {
     public static final int NO_VALUE = -1;
 
+    private static final long MAX_IPV4_BIT = 0x80000000L;
+
     public static class Node {
-        Node right, left, parent;
-        int value;
+        private Node right, left, parent;
+        private int value;
     }
 
     private Node root;
@@ -18,7 +24,7 @@ public class IPv4RadixIntTree {
     }
 
     public void put(long key, long mask, int value) {
-        long bit = 0x80000000L;
+        long bit = MAX_IPV4_BIT;
         Node node = root;
         Node next = root;
 
@@ -59,7 +65,7 @@ public class IPv4RadixIntTree {
     }
 
     public int selectValue(long key) {
-        long bit = 0x80000000L;
+        long bit = MAX_IPV4_BIT;
         int value = NO_VALUE;
         Node node = root;
 
@@ -71,6 +77,26 @@ public class IPv4RadixIntTree {
         }
 
         return value;
+    }
+
+    public void put(String ipNet, int value) throws UnknownHostException {
+        int pos = ipNet.indexOf('/');
+        String ipStr = ipNet.substring(0, pos);
+        long ip = inet_aton(ipStr);
+
+        String netmaskStr = ipNet.substring(pos + 1);
+        int cidr = Integer.parseInt(netmaskStr);
+        long netmask =  ((1L << (32 - cidr)) - 1L) ^ 0xffffffffL;
+
+        put(ip, netmask, value);
+    }
+
+    private static long inet_aton(String ipStr) throws UnknownHostException {
+        ByteBuffer bb = ByteBuffer.allocate(8);
+        bb.putInt(0);
+        bb.put(InetAddress.getByName(ipStr).getAddress());
+        bb.rewind();
+        return bb.getLong();
     }
 
     public int size() { return size; }
