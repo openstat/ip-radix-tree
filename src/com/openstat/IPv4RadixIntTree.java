@@ -1,5 +1,8 @@
 package com.openstat;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -89,6 +92,21 @@ public class IPv4RadixIntTree {
         long netmask =  ((1L << (32 - cidr)) - 1L) ^ 0xffffffffL;
 
         put(ip, netmask, value);
+    }
+
+    public int selectValue(String ipStr) throws UnknownHostException {
+        return selectValue(inet_aton(ipStr));
+    }
+
+    public static IPv4RadixIntTree loadFromLocalFile(String filename) throws IOException {
+        IPv4RadixIntTree tr = new IPv4RadixIntTree();
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        String l;
+        while ((l = br.readLine()) != null) {
+            String[] c = l.split("\t", -1);
+            tr.put(c[0], Integer.parseInt(c[1]));
+        }
+        return tr;
     }
 
     private static long inet_aton(String ipStr) throws UnknownHostException {
