@@ -48,5 +48,6 @@ public class RadixTreeTests {
             assertEquals(tr.selectValue(c[0]), Integer.parseInt(c[1]), "Mismatch in line #" + n);
             n++;
         }
+        System.out.println(tr.size());
     }
 }
