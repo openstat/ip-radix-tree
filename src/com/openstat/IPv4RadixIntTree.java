@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
+import org.apache.hadoop.mapred.JobConf;
+
 /**
  * A minimalistic, memory size-savvy and fairly fast radix tree (AKA Patricia trie)
  * implementation that uses IPv4 addresses with netmasks as keys and 32-bit signed
@@ -203,9 +205,10 @@ public class IPv4RadixIntTree {
     }
 
     /**
-     * Helper function that reads
-     * @param filename
-     * @return
+     * Helper function that reads IPv4 radix tree from a local file in tab-separated format:
+     * (IPv4 net => value)
+     * @param filename name of a local file to read
+     * @return a fully constructed IPv4 radix tree from that file
      * @throws IOException
      */
     public static IPv4RadixIntTree loadFromLocalFile(String filename) throws IOException {
