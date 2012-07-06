@@ -23,8 +23,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-import org.apache.hadoop.mapred.JobConf;
-
 /**
  * A minimalistic, memory size-savvy and fairly fast radix tree (AKA Patricia trie)
  * implementation that uses IPv4 addresses with netmasks as keys and 32-bit signed
@@ -212,20 +210,39 @@ public class IPv4RadixIntTree {
      * @throws IOException
      */
     public static IPv4RadixIntTree loadFromLocalFile(String filename) throws IOException {
-        BufferedReader br;
+        return loadFromLocalFile(filename, false);
+    }
+
+    /**
+     * Helper function that reads IPv4 radix tree from a local file in tab-separated format:
+     * (IPv4 net => value)
+     * @param filename name of a local file to read
+     * @param nginxFormat if true, then file would be parsed as nginx web server configuration file:
+     * "value" would be treated as hex and last symbol at EOL would be stripped (as normally nginx
+     * config files has lines ending with ";")
+     * @return a fully constructed IPv4 radix tree from that file
+     * @throws IOException
+     */
+    public static IPv4RadixIntTree loadFromLocalFile(String filename, boolean nginxFormat) throws IOException {
+        IPv4RadixIntTree tr = new IPv4RadixIntTree(countLinesInLocalFile(filename));
+        BufferedReader br = new BufferedReader(new FileReader(filename));
         String l;
+        int value;
 
-        br = new BufferedReader(new FileReader(filename));
-        int n = 0;
-        while ((l = br.readLine()) != null) {
-            n++;
-        }
-
-        IPv4RadixIntTree tr = new IPv4RadixIntTree(n);
-        br = new BufferedReader(new FileReader(filename));
         while ((l = br.readLine()) != null) {
             String[] c = l.split("\t", -1);
-            tr.put(c[0], Integer.parseInt(c[1]));
+
+            if (nginxFormat) {
+                // strip ";" at EOL
+                c[1] = c[1].substring(0, c[1].length() - 1);
+
+                // NB: this is to work around malicious "80000000" AS number
+                value = (int) Long.parseLong(c[1], 16);
+            } else {
+                value = Integer.parseInt(c[1]);
+            }
+
+            tr.put(c[0], value);
         }
 
         return tr;
@@ -237,6 +254,16 @@ public class IPv4RadixIntTree {
         bb.put(InetAddress.getByName(ipStr).getAddress());
         bb.rewind();
         return bb.getLong();
+    }
+
+    private static int countLinesInLocalFile(String filename) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        int n = 0;
+        String l;
+        while ((l = br.readLine()) != null) {
+            n++;
+        }
+        return n;
     }
 
     /**

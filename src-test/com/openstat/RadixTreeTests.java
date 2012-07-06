@@ -50,4 +50,18 @@ public class RadixTreeTests {
         }
         System.out.println(tr.size());
     }
+
+    @Test
+    public void testNginx() throws IOException {
+        IPv4RadixIntTree tr = IPv4RadixIntTree.loadFromLocalFile("test/ip-prefix-nginx.txt", true);
+        BufferedReader br = new BufferedReader(new FileReader("test/test-nginx.txt"));
+        String l;
+        int n = 0;
+        while ((l = br.readLine()) != null) {
+            String[] c = l.split("\t", -1);
+            assertEquals(tr.selectValue(c[0]), Integer.parseInt(c[1]), "Mismatch in line #" + n);
+            n++;
+        }
+        System.out.println(tr.size());
+    }
 }
