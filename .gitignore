@@ -1,2 +1,4 @@
-bin
-test-output
+out
+build
+target
+.idea
